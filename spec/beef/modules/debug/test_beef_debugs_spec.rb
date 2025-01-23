@@ -1,6 +1,6 @@
 #
-# Copyright (c) 2006-2022 Wade Alcorn - wade@bindshell.net
-# Browser Exploitation Framework (BeEF) - http://beefproject.com
+# Copyright (c) 2006-2025 Wade Alcorn - wade@bindshell.net
+# Browser Exploitation Framework (BeEF) - https://beefproject.com
 # See the file 'doc/COPYING' for copying permission
 #
 
@@ -39,15 +39,16 @@ RSpec.describe 'BeEF Debug Command Modules:', run_on_browserstack: true do
 
     # Load up DB and migrate if necessary
     ActiveRecord::Base.logger = nil
-    OTR::ActiveRecord.migrations_paths = [File.join('core', 'main', 'ar-migrations')]
     OTR::ActiveRecord.configure_from_hash!(adapter: 'sqlite3', database: db_file)
     # otr-activerecord require you to manually establish the connection with the following line
     #Also a check to confirm that the correct Gem version is installed to require it, likely easier for old systems.
     if Gem.loaded_specs['otr-activerecord'].version > Gem::Version.create('1.4.2')
       OTR::ActiveRecord.establish_connection!
     end
-    context = ActiveRecord::Migration.new.migration_context
-    ActiveRecord::Migrator.new(:up, context.migrations, context.schema_migration).migrate if context.needs_migration?
+
+    ActiveRecord::Migrator.migrations_paths = [File.join('core', 'main', 'ar-migrations')]
+    context = ActiveRecord::MigrationContext.new(ActiveRecord::Migrator.migrations_paths)
+    ActiveRecord::Migrator.new(:up, context.migrations, context.schema_migration, context.internal_metadata).migrate if context.needs_migration?
 
     BeEF::Core::Migration.instance.update_db!
 
@@ -72,10 +73,9 @@ RSpec.describe 'BeEF Debug Command Modules:', run_on_browserstack: true do
       @caps['name'] = self.class.description || ENV['name'] || 'no-name'
       @caps['browserstack.local'] = true
       @caps['browserstack.localIdentifier'] = ENV['BROWSERSTACK_LOCAL_IDENTIFIER']
-
       @driver = Selenium::WebDriver.for(:remote,
                                         url: "http://#{CONFIG['user']}:#{CONFIG['key']}@#{CONFIG['server']}/wd/hub",
-                                        desired_capabilities: @caps)
+                                        options: @caps)
       # Hook new victim
       print_info 'Hooking a new victim, waiting a few seconds...'
       wait = Selenium::WebDriver::Wait.new(timeout: 30) # seconds
@@ -91,10 +91,17 @@ RSpec.describe 'BeEF Debug Command Modules:', run_on_browserstack: true do
       # Grab Command Module IDs as they can differ from machine to machine
       @debug_mod_ids = JSON.parse(RestClient.get("#{RESTAPI_MODULES}?token=#{@token}"))
       @debug_mod_names_ids = {}
-      @debug_mods = @debug_mod_ids.to_a.select { |cmd_mod| cmd_mod[1]['category'] == 'Debug' }
-                                  .map do |debug_mod|
-                                    @debug_mod_names_ids[debug_mod[1]['class']] = debug_mod[1]['id']
-                                  end
+      @debug_mods = @debug_mod_ids.to_a.select do |cmd_mod|
+        category = Array(cmd_mod['category'])
+        category_string = if category.is_a?(Array)
+                            category.join(', ')
+                          else
+                            category.to_s
+                          end
+        category_string.include?('Debug')
+      end.map do |debug_mod|
+        @debug_mod_names_ids[debug_mod['class']] = debug_mod['id']
+      end
     rescue StandardError => e
       print_info "Exception: #{e}"
       print_info "Exception Class: #{e.class}"
@@ -119,16 +126,6 @@ RSpec.describe 'BeEF Debug Command Modules:', run_on_browserstack: true do
                                content_type: :json
     result_data = JSON.parse(response.body)
     expect(result_data['success']).to eq 'true'
-  rescue StandardError => e
-    print_info "Exception: #{e}"
-    print_info "Exception Class: #{e.class}"
-    print_info "Exception Message: #{e.message}"
-    print_info "Exception Stack Trace: #{e.backtrace}"
-    if @driver.execute_script('return window.beef.session.get_hook_session_id().length').nil?
-      exit 1
-    else
-      exit 0
-    end
   end
 
   it 'The Return ASCII Characters command module successfully executes' do
@@ -138,16 +135,6 @@ RSpec.describe 'BeEF Debug Command Modules:', run_on_browserstack: true do
                                content_type: :json
     result_data = JSON.parse(response.body)
     expect(result_data['success']).to eq 'true'
-  rescue StandardError => e
-    print_info "Exception: #{e}"
-    print_info "Exception Class: #{e.class}"
-    print_info "Exception Message: #{e.message}"
-    print_info "Exception Stack Trace: #{e.backtrace}"
-    if @driver.execute_script('return window.beef.session.get_hook_session_id().length').nil?
-      exit 1
-    else
-      exit 0
-    end
   end
 
   it 'The Return Image command module successfully executes' do
@@ -157,16 +144,6 @@ RSpec.describe 'BeEF Debug Command Modules:', run_on_browserstack: true do
                                content_type: :json
     result_data = JSON.parse(response.body)
     expect(result_data['success']).to eq 'true'
-  rescue StandardError => e
-    print_info "Exception: #{e}"
-    print_info "Exception Class: #{e.class}"
-    print_info "Exception Message: #{e.message}"
-    print_info "Exception Stack Trace: #{e.backtrace}"
-    if @driver.execute_script('return window.beef.session.get_hook_session_id().length').nil?
-      exit 1
-    else
-      exit 0
-    end
   end
 
   it 'The Test HTTP Redirect command module successfully executes' do
@@ -176,16 +153,6 @@ RSpec.describe 'BeEF Debug Command Modules:', run_on_browserstack: true do
                                content_type: :json
     result_data = JSON.parse(response.body)
     expect(result_data['success']).to eq 'true'
-  rescue StandardError => e
-    print_info "Exception: #{e}"
-    print_info "Exception Class: #{e.class}"
-    print_info "Exception Message: #{e.message}"
-    print_info "Exception Stack Trace: #{e.backtrace}"
-    if @driver.execute_script('return window.beef.session.get_hook_session_id().length').nil?
-      exit 1
-    else
-      exit 0
-    end
   end
 
   it 'The Test Returning Results/Long String command module successfully executes' do
@@ -196,17 +163,6 @@ RSpec.describe 'BeEF Debug Command Modules:', run_on_browserstack: true do
                                content_type: :json
     result_data = JSON.parse(response.body)
     expect(result_data['success']).to eq 'true'
-  rescue StandardError => e
-    print_info "Exception: #{e}"
-    print_info "Exception Class: #{e.class}"
-    print_info "Exception Message: #{e.message}"
-    print_info "Exception Stack Trace: #{e.backtrace}"
-    print_info "Exception Message: #{e.backtrace}"
-    if @driver.execute_script('return window.beef.session.get_hook_session_id().length').nil?
-      exit 1
-    else
-      exit 0
-    end
   end
 
   it 'The Test Network Request command module successfully executes' do
@@ -224,16 +180,6 @@ RSpec.describe 'BeEF Debug Command Modules:', run_on_browserstack: true do
                                content_type: :json
     result_data = JSON.parse(response.body)
     expect(result_data['success']).to eq 'true'
-  rescue StandardError => e
-    print_info "Exception: #{e}"
-    print_info "Exception Class: #{e.class}"
-    print_info "Exception Message: #{e.message}"
-    print_info "Exception Stack Trace: #{e.backtrace}"
-    if @driver.execute_script('return window.beef.session.get_hook_session_id().length').nil?
-      exit 1
-    else
-      exit 0
-    end
   end
 
   it 'The Test DNS Tunnel command module successfully executes' do
@@ -244,16 +190,6 @@ RSpec.describe 'BeEF Debug Command Modules:', run_on_browserstack: true do
                                content_type: :json
     result_data = JSON.parse(response.body)
     expect(result_data['success']).to eq 'true'
-  rescue StandardError => e
-    print_info "Exception: #{e}"
-    print_info "Exception Class: #{e.class}"
-    print_info "Exception Message: #{e.message}"
-    print_info "Exception Stack Trace: #{e.backtrace}"
-    if @driver.execute_script('return window.beef.session.get_hook_session_id().length').nil?
-      exit 1
-    else
-      exit 0
-    end
   end
 
   it 'The Test CORS Request command module successfully executes' do
@@ -267,15 +203,5 @@ RSpec.describe 'BeEF Debug Command Modules:', run_on_browserstack: true do
                                content_type: :json
     result_data = JSON.parse(response.body)
     expect(result_data['success']).to eq 'true'
-  rescue StandardError => e
-    print_info "Exception: #{e}"
-    print_info "Exception Class: #{e.class}"
-    print_info "Exception Message: #{e.message}"
-    print_info "Exception Stack Trace: #{e.backtrace}"
-    if @driver.execute_script('return window.beef.session.get_hook_session_id().length').nil?
-      exit 1
-    else
-      exit 0
-    end
   end
 end

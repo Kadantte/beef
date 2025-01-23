@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 
 #
-# Copyright (c) 2006-2022 Wade Alcorn - wade@bindshell.net
-# Browser Exploitation Framework (BeEF) - http://beefproject.com
+# Copyright (c) 2006-2025 Wade Alcorn - wade@bindshell.net
+# Browser Exploitation Framework (BeEF) - https://beefproject.com
 # See the file 'doc/COPYING' for copying permission
 #
 
@@ -12,9 +12,9 @@
 $VERBOSE = nil
 
 #
-# @note Version check to ensure BeEF is running Ruby 2.7+
+# @note Version check to ensure BeEF is running Ruby 3.0+
 #
-min_ruby_version = '2.7'
+min_ruby_version = '3.0'
 if RUBY_VERSION < min_ruby_version
   puts
   puts "Ruby version #{RUBY_VERSION} is no longer supported. Please upgrade to Ruby version #{min_ruby_version} or later."
@@ -185,7 +185,7 @@ db_file = config.get('beef.database.file')
 if BeEF::Core::Console::CommandLine.parse[:resetdb]
   print_info 'Resetting the database for BeEF.'
   begin
-    File.delete(db_file) if File.exists?(db_file)
+    File.delete(db_file) if File.exist?(db_file)
   rescue => e
     print_error("Could not remove '#{db_file}' database file: #{e.message}")
     exit(1)
@@ -194,7 +194,6 @@ end
 
 # Connect to DB
 ActiveRecord::Base.logger = nil
-OTR::ActiveRecord.migrations_paths = [File.join('core', 'main', 'ar-migrations')]
 OTR::ActiveRecord.configure_from_hash!(adapter:'sqlite3', database:db_file)
 # otr-activerecord require you to manually establish the connection with the following line
 #Also a check to confirm that the correct Gem version is installed to require it, likely easier for old systems.
@@ -203,10 +202,13 @@ if Gem.loaded_specs['otr-activerecord'].version > Gem::Version.create('1.4.2')
 end
 
 # Migrate (if required)
-context = ActiveRecord::Migration.new.migration_context
+ActiveRecord::Migration.verbose = false # silence activerecord migration stdout messages
+ActiveRecord::Migrator.migrations_paths = [File.join('core', 'main', 'ar-migrations')]
+context = ActiveRecord::MigrationContext.new(ActiveRecord::Migrator.migrations_paths)
 if context.needs_migration?
-  ActiveRecord::Migrator.new(:up, context.migrations, context.schema_migration).migrate
+  ActiveRecord::Migrator.new(:up, context.migrations, context.schema_migration, context.internal_metadata).migrate
 end
+
 #
 # @note Extensions may take a moment to load, thus we print out a please wait message
 #
@@ -242,6 +244,8 @@ BeEF::Core::Console::Banners.print_loaded_extensions
 BeEF::Core::Console::Banners.print_loaded_modules
 BeEF::Core::Console::Banners.print_network_interfaces_count
 BeEF::Core::Console::Banners.print_network_interfaces_routes
+BeEF::Core::Console::Banners.print_http_proxy
+BeEF::Core::Console::Banners.print_dns
 
 #
 # @note Prints the API key needed to use the RESTful API

@@ -1,6 +1,6 @@
 //
-// Copyright (c) 2006-2022 Wade Alcorn - wade@bindshell.net
-// Browser Exploitation Framework (BeEF) - http://beefproject.com
+// Copyright (c) 2006-2025 Wade Alcorn - wade@bindshell.net
+// Browser Exploitation Framework (BeEF) - https://beefproject.com
 // See the file 'doc/COPYING' for copying permission
 //
 
@@ -79,7 +79,7 @@ Ext.extend(zombiesTreeList, Ext.tree.TreePanel, {
   end
   if (BeEF::Core::Configuration.instance.get("beef.extension.xssrays.enable"))
     context_menu << {
-      id: 'xssrays_hooked_domain',
+      id: 'xssrays_hooked_origin',
       text: 'Launch XssRays on Hooked Domain',
       iconCls: 'zombie-tree-ctxMenu-xssrays'
     }
@@ -121,7 +121,7 @@ Ext.extend(zombiesTreeList, Ext.tree.TreePanel, {
                                 jsonData: {'hb_id': escape(hb_id)}
                             });
                           break;
-                       case 'xssrays_hooked_domain':
+                       case 'xssrays_hooked_origin':
                            Ext.Ajax.request({
                                 url: '/api/xssrays/scan/' + escape(hb_id) + '?token=' + beefwui.get_rest_token(),
                                 method: 'POST'
@@ -240,7 +240,7 @@ try{
 			this.addZombie(offline_hooked_browser, offline_hooked_browser["online"], offline_hooked_browser["checkbox"]);
 		}, this)
 		
-		//expands the online hooked browser branch
+		//expands the offline hooked browser branch
 		if(this.offline_hooked_browsers_treenode.childNodes.length > 0)
 			this.offline_hooked_browsers_treenode.expand(true);
 	},

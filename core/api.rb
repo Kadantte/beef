@@ -1,6 +1,6 @@
 #
-# Copyright (c) 2006-2022 Wade Alcorn - wade@bindshell.net
-# Browser Exploitation Framework (BeEF) - http://beefproject.com
+# Copyright (c) 2006-2025 Wade Alcorn - wade@bindshell.net
+# Browser Exploitation Framework (BeEF) - https://beefproject.com
 # See the file 'doc/COPYING' for copying permission
 #
 
@@ -184,7 +184,7 @@ module BeEF
         mods = get_owners(clss, mthd, args)
         return nil unless mods.length.positive?
 
-        unless verify_api_path(clss, mthd) && clss.ancestors[0].to_s > 'BeEF::API'
+        unless verify_api_path(clss, mthd) && clss.ancestors.first.to_s.start_with?('BeEF::API')
           print_error "API Path not defined for Class: #{clss} method: #{mthd}"
           return []
         end

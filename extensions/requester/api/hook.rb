@@ -1,6 +1,6 @@
 #
-# Copyright (c) 2006-2022 Wade Alcorn - wade@bindshell.net
-# Browser Exploitation Framework (BeEF) - http://beefproject.com
+# Copyright (c) 2006-2025 Wade Alcorn - wade@bindshell.net
+# Browser Exploitation Framework (BeEF) - https://beefproject.com
 # See the file 'doc/COPYING' for copying permission
 #
 
@@ -37,8 +37,8 @@ module BeEF
             # If we use WebSockets, just reply wih the component contents
             if config.get('beef.http.websocket.enable') && ws.getsocket(hb.session)
               content = File.read(find_beefjs_component_path('beef.net.requester')).gsub('//
-              //   Copyright (c) 2006-2022 Wade Alcorn - wade@bindshell.net
-              //   Browser Exploitation Framework (BeEF) - http://beefproject.com
+              //   Copyright (c) 2006-2025Wade Alcorn - wade@bindshell.net
+              //   Browser Exploitation Framework (BeEF) - https://beefproject.com
               //   See the file \'doc/COPYING\' for copying permission
               //', '')
               add_to_body output
@@ -81,7 +81,7 @@ module BeEF
           # The Hash will then be converted into JSON, given as input to beef.net.requester.send Javascript API function
           # and finally sent to and executed by the hooked browser.
           def requester_parse_db_request(http_db_object)
-            allow_cross_domain = http_db_object.allow_cross_domain.to_s
+            allow_cross_origin = http_db_object.allow_cross_origin.to_s
             verb = http_db_object.method.upcase
             proto = http_db_object.proto.downcase
             uri = http_db_object.request.split(/\s+/)[1]
@@ -137,7 +137,7 @@ module BeEF
               'port' => @port,
               'uri' => uri,
               'headers' => headers,
-              'allowCrossDomain' => allow_cross_domain
+              'allowCrossOrigin' => allow_cross_origin
             }
 
             # Add POST request data

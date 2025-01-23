@@ -1,6 +1,6 @@
 #
-# Copyright (c) 2006-2022 Wade Alcorn - wade@bindshell.net
-# Browser Exploitation Framework (BeEF) - http://beefproject.com
+# Copyright (c) 2006-2025 Wade Alcorn - wade@bindshell.net
+# Browser Exploitation Framework (BeEF) - https://beefproject.com
 # See the file 'doc/COPYING' for copying permission
 #
 module BeEF
@@ -9,10 +9,8 @@ module BeEF
       extend BeEF::API::Extension
 
       @short_name = 'events_logger'
-
-      @full_name = 'events logger'
-
-      @description = 'registers mouse clicks, keystrokes, form submissions'
+      @full_name = 'Event Logger'
+      @description = 'Logs browser events, such as mouse clicks, keystrokes, and form submissions.'
     end
   end
 end

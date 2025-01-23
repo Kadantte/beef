@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2006-2022 Wade Alcorn wade@bindshell.net
+# Copyright (c) 2006-2025Wade Alcorn wade@bindshell.net
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 class Read_inotes < BeEF::Core::Command
   def self.options
     [
-      { 'type' => 'label', 'html' => 'Provide unid to retrieve details of a Note:' },
+      { 'type' => 'label', 'name' => 'name', 'html' => 'Provide unid to retrieve details of a Note:' },
       { 'type' => 'textfield', 'name' => 'unid', 'ui_label' => 'notes unid', 'value' => '1' }
     ]
   end

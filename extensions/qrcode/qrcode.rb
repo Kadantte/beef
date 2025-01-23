@@ -1,6 +1,6 @@
 #
-# Copyright (c) 2006-2022 Wade Alcorn - wade@bindshell.net
-# Browser Exploitation Framework (BeEF) - http://beefproject.com
+# Copyright (c) 2006-2025 Wade Alcorn - wade@bindshell.net
+# Browser Exploitation Framework (BeEF) - https://beefproject.com
 # See the file 'doc/COPYING' for copying permission
 #
 module BeEF
@@ -28,14 +28,21 @@ module BeEF
               fullurls << target
             # relative URLs
             else
-              # network interfaces
-              BeEF::Core::Console::Banners.interfaces.each do |int|
-                next if int == '0.0.0.0'
+              
+              # Retrieve the list of network interfaces from BeEF::Core::Console::Banners
+              interfaces = BeEF::Core::Console::Banners.interfaces
 
-                fullurls << "#{beef_proto}://#{int}:#{beef_port}#{target}"
+              if not interfaces.nil? and not interfaces.empty? # If interfaces are available, iterate over each network interface
+                # If interfaces are available, iterate over each network interface
+                interfaces.each do |int|
+                  # Skip the loop iteration if the interface address is '0.0.0.0' (which generally represents all IPv4 addresses on the local machine)
+                  next if int == '0.0.0.0'
+                  # Construct full URLs using the network interface address, and add them to the fullurls array
+                  # The URL is composed of the BeEF protocol, interface address, BeEF port, and the target path
+                  fullurls << "#{beef_proto}://#{int}:#{beef_port}#{target}"
+                end
               end
-              # beef host
-              fullurls << "#{beef_proto}://#{beef_host}:#{beef_port}#{target}" unless beef_host == '0.0.0.0'
+
             end
           end
 
@@ -72,12 +79,12 @@ module BeEF
             data += "#{beef_proto}://#{beef_host}:#{beef_port}/qrcode/#{fname}.png\n"
             data += "- URL: #{target}\n"
             # Google API
-            # url = URI.escape(target,Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
+            # url = URI::Parser.new.escape(target,Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
             # w = configuration.get("beef.extension.qrcode.qrsize").to_i * 100
             # h = configuration.get("beef.extension.qrcode.qrsize").to_i * 100
             # data += "- Google API: https://chart.googleapis.com/chart?cht=qr&chs=#{w}x#{h}&chl=#{url}\n"
             # QRServer.com
-            # url = URI.escape(target,Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
+            # url = URI::Parser.new.escape(target,Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
             # w = configuration.get("beef.extension.qrcode.qrsize").to_i * 100
             # h = configuration.get("beef.extension.qrcode.qrsize").to_i * 100
             # data += "- QRServer API: https://api.qrserver.com/v1/create-qr-code/?size=#{w}x#{h}&data=#{url}\n"

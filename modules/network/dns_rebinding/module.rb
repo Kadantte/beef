@@ -1,3 +1,8 @@
+#
+# Copyright (c) 2006-2025 Wade Alcorn - wade@bindshell.net
+# Browser Exploitation Framework (BeEF) - https://beefproject.com
+# See the file 'doc/COPYING' for copying permission
+#
 class Dns_rebinding < BeEF::Core::Command
   def self.options
     domain = BeEF::Core::Configuration.instance.get('beef.module.dns_rebinding.domain')

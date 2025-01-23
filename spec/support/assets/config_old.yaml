@@ -1,6 +1,6 @@
 #
-# Copyright (c) 2006-2022 Wade Alcorn - wade@bindshell.net
-# Browser Exploitation Framework (BeEF) - http://beefproject.com
+# Copyright (c) 2006-2025 Wade Alcorn - wade@bindshell.net
+# Browser Exploitation Framework (BeEF) - https://beefproject.com
 # See the file 'doc/COPYING' for copying permission
 #
 # BeEF Configuration file
@@ -120,13 +120,6 @@ beef:
     geoip:
         enable: true
         database: '/opt/GeoIP/GeoLite2-City.mmdb'
-
-    # Integration with PhishingFrenzy
-    # If enabled BeEF will try to get the UID parameter value from the hooked URI, as this is used by PhishingFrenzy
-    # to uniquely identify the victims. In this way you can easily associate phishing emails with hooked browser.
-    integration:
-        phishing_frenzy:
-            enable: false
 
     # You may override default extension configuration parameters here
     # Note: additional experimental extensions are available in the 'extensions' directory

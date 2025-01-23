@@ -1,6 +1,6 @@
 #
-# Copyright (c) 2006-2022 Wade Alcorn - wade@bindshell.net
-# Browser Exploitation Framework (BeEF) - http://beefproject.com
+# Copyright (c) 2006-2025 Wade Alcorn - wade@bindshell.net
+# Browser Exploitation Framework (BeEF) - https://beefproject.com
 # See the file 'doc/COPYING' for copying permission
 #
 module BeEF
@@ -19,7 +19,7 @@ module BeEF
             beef_js_path = "#{$root_dir}/core/main/client/"
 
             # @note External libraries (like jQuery) that are not evaluated with Eruby and possibly not obfuscated
-            ext_js_sub_files = %w[lib/jquery-1.12.4.min.js lib/jquery-migrate-1.4.1.js lib/evercookie.js lib/json2.js lib/mdetect.js lib/platform.js lib/jquery.blockUI.js]
+            ext_js_sub_files = %w[lib/jquery-1.12.4.min.js lib/jquery-migrate-1.4.1.js lib/evercookie.js lib/json2.js lib/mdetect.js lib/platform.js lib/jquery.blockUI.js lib/bowser-2.11.0.min.js]
 
             # @note BeEF libraries: need Eruby evaluation and obfuscation
             beef_js_sub_files = %w[beef.js browser.js browser/cookie.js browser/popup.js session.js os.js hardware.js dom.js logger.js net.js updater.js encode/base64.js
@@ -99,9 +99,6 @@ module BeEF
               hook_session_config['ws_connect_timeout'] = config.get('beef.http.websocket.ws_connect_timeout')
               hook_session_config['websocket_sec_port'] = config.get('beef.http.websocket.secure_port')
             end
-
-            # @note Set if PhishingFrenzy integration is enabled
-            hook_session_config['phishing_frenzy_enable'] = config.get('beef.integration.phishing_frenzy.enable') if config.get('beef.integration.phishing_frenzy.enable')
 
             # @note populate place holders in the beef_js string and set the response body
             eruby = Erubis::FastEruby.new(beef_js)

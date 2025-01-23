@@ -1,6 +1,6 @@
 #
-# Copyright (c) 2006-2022 Wade Alcorn - wade@bindshell.net
-# Browser Exploitation Framework (BeEF) - http://beefproject.com
+# Copyright (c) 2006-2025 Wade Alcorn - wade@bindshell.net
+# Browser Exploitation Framework (BeEF) - https://beefproject.com
 # See the file 'doc/COPYING' for copying permission
 #
 module BeEF
@@ -19,6 +19,7 @@ require 'core/main/models/optioncache'
 require 'core/main/models/browserdetails'
 require 'core/main/models/rule'
 require 'core/main/models/execution'
+require 'core/main/models/legacybrowseruseragents'
 
 # @note Include the constants
 require 'core/main/constants/browsers'

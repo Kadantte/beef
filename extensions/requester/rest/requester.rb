@@ -1,6 +1,6 @@
 #
-# Copyright (c) 2006-2022 Wade Alcorn - wade@bindshell.net
-# Browser Exploitation Framework (BeEF) - http://beefproject.com
+# Copyright (c) 2006-2025 Wade Alcorn - wade@bindshell.net
+# Browser Exploitation Framework (BeEF) - https://beefproject.com
 # See the file 'doc/COPYING' for copying permission
 #
 module BeEF
@@ -181,7 +181,7 @@ module BeEF
             port: host_port,
             path: uri,
             request_date: Time.now,
-            allow_cross_domain: 'true'
+            allow_cross_origin: 'true'
           )
 
           print_debug "added new http request for #{zombie.session}"
@@ -229,9 +229,13 @@ module BeEF
         def response2hash(http)
           response_data = ''
 
-          if !http.response_data.nil? && (http.response_data.length > (1024 * 100)) # more thank 100K
-            response_data = http.response_data[0..(1024 * 100)]
-            response_data += "\n<---------- Response Data Truncated---------->"
+          unless http.response_data.nil?
+            if (http.response_data.length > (1024 * 100)) # more than 100K
+              response_data = http.response_data[0..(1024 * 100)]
+              response_data += "\n<---------- Response Data Truncated---------->"
+            else
+              response_data = http.response_data
+            end
           end
 
           response_headers = ''

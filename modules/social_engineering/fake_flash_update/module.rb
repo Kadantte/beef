@@ -1,6 +1,6 @@
 #
-# Copyright (c) 2006-2022 Wade Alcorn - wade@bindshell.net
-# Browser Exploitation Framework (BeEF) - http://beefproject.com
+# Copyright (c) 2006-2025 Wade Alcorn - wade@bindshell.net
+# Browser Exploitation Framework (BeEF) - https://beefproject.com
 # See the file 'doc/COPYING' for copying permission
 #
 class Fake_flash_update < BeEF::Core::Command
@@ -19,11 +19,7 @@ class Fake_flash_update < BeEF::Core::Command
 
     [
       { 'name' => 'image', 'description' => 'Location of image for the update prompt', 'ui_label' => 'Image', 'value' => image },
-      { 'name' => 'payload', 'type' => 'combobox', 'ui_label' => 'Payload', 'store_type' => 'arraystore',
-        'store_fields' => ['payload'], 'store_data' => [['Custom_Payload'], ['Firefox_Extension']],
-        'valueField' => 'payload', 'displayField' => 'payload', 'mode' => 'local', 'autoWidth' => true, 'value' => 'Custom_Payload' },
-      { 'name' => 'payload_uri', 'description' => 'Custom Payload URI', 'ui_label' => 'Custom Payload URI',
-        'value' => 'https://github.com/beefproject/beef/archive/master.zip' }
+      { 'name' => 'payload_uri', 'description' => 'Payload URI', 'ui_label' => 'Payload URI', 'value' => '' }
     ]
   end
 

@@ -1,6 +1,6 @@
 #
-# Copyright (c) 2006-2022 Wade Alcorn - wade@bindshell.net
-# Browser Exploitation Framework (BeEF) - http://beefproject.com
+# Copyright (c) 2006-2025 Wade Alcorn - wade@bindshell.net
+# Browser Exploitation Framework (BeEF) - https://beefproject.com
 # See the file 'doc/COPYING' for copying permission
 #
 module BeEF
@@ -28,11 +28,13 @@ module BeEF
 
           # validate hook session value
           session_id = get_param(@data, 'beefhook')
+
           print_debug "[INIT] Processing Browser Details for session #{session_id}"
           unless BeEF::Filters.is_valid_hook_session_id?(session_id)
-            (err_msg 'session id is invalid'
-             return)
+            err_msg 'session id is invalid'
+            return
           end
+
           hooked_browser = HB.where(session: session_id).first
           return unless hooked_browser.nil? # browser is already registered with framework
 
@@ -398,6 +400,8 @@ module BeEF
           browser_plugins = get_param(@data['results'], 'browser.plugins')
           if BeEF::Filters.is_valid_browser_plugins?(browser_plugins)
             BD.set(session_id, 'browser.plugins', browser_plugins)
+          elsif browser_plugins == "[]"
+            err_msg "No browser plugins detected."
           else
             err_msg "Invalid browser plugins returned from the hook browser's initial connection."
           end
@@ -544,19 +548,8 @@ module BeEF
             err_msg "Invalid value for hardware.screen.touchenabled returned from the hook browser's initial connection."
           end
 
-          if config.get('beef.integration.phishing_frenzy.enable')
-            # get and store the browser plugins
-            victim_uid = get_param(@data['results'], 'PhishingFrenzyUID')
-            print_debug "PhishingFrenzy victim UID is #{victim_uid}"
-            if BeEF::Filters.alphanums_only?(victim_uid)
-              BD.set(session_id, 'PhishingFrenzyUID', victim_uid)
-            else
-              err_msg "Invalid PhishingFrenzy Victim UID returned from the hook browser's initial connection."
-            end
-          end
-
           # log a few info of newly hooked zombie in the console
-          print_info "New Hooked Browser [id:#{zombie.id}, ip:#{zombie.ip}, browser:#{browser_name}-#{browser_version}, os:#{os_name}-#{os_version}], hooked domain [#{log_zombie_domain}:#{log_zombie_port}]"
+          print_info "New Hooked Browser [id:#{zombie.id}, ip:#{zombie.ip}, browser:#{browser_name}-#{browser_version}, os:#{os_name}-#{os_version}], hooked origin [#{log_zombie_domain}:#{log_zombie_port}]"
 
           # add localhost as network host
           if config.get('beef.extension.network.enable')
@@ -567,7 +560,7 @@ module BeEF
 
           # check if any ARE rules shall be triggered only if the channel is != WebSockets (XHR). If the channel
           # is WebSockets, then ARe rules are triggered after channel is established.
-          BeEF::Core::AutorunEngine::Engine.instance.run(zombie.id, browser_name, browser_version, os_name, os_version) unless config.get('beef.http.websocket.enable')
+          BeEF::Core::AutorunEngine::Engine.instance.find_and_run_all_matching_rules_for_zombie(zombie.id) unless config.get('beef.http.websocket.enable')
         end
 
         def get_param(query, key)

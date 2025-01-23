@@ -1,6 +1,6 @@
 #
-# Copyright (c) 2006-2022 Wade Alcorn - wade@bindshell.net
-# Browser Exploitation Framework (BeEF) - http://beefproject.com
+# Copyright (c) 2006-2025 Wade Alcorn - wade@bindshell.net
+# Browser Exploitation Framework (BeEF) - https://beefproject.com
 # See the file 'doc/COPYING' for copying permission
 #
 module BeEF
@@ -77,9 +77,6 @@ module BeEF
               ui/panel/tabs/ZombieTabCommands.js
               ui/panel/tabs/ZombieTabRider.js
               ui/panel/tabs/ZombieTabXssRays.js
-              wterm/wterm.jquery.js
-              ui/panel/tabs/ZombieTabIpec.js
-              ui/panel/tabs/ZombieTabAutorun.js
               ui/panel/PanelViewer.js
               ui/panel/LogsDataGrid.js
               ui/panel/BrowserDetailsDataGrid.js
@@ -93,6 +90,9 @@ module BeEF
               ui/panel/tabs/ZombieTabRTC.js
               ui/panel/Logout.js
               ui/panel/WelcomeTab.js
+              ui/panel/AutoRunTab.js
+              ui/panel/AutoRunRuleForm.js
+              ui/panel/AutoRunModuleForm.js
               ui/panel/ModuleSearching.js
             ]
 

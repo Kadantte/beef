@@ -1,6 +1,6 @@
 #
-# Copyright (c) 2006-2022 Wade Alcorn - wade@bindshell.net
-# Browser Exploitation Framework (BeEF) - http://beefproject.com
+# Copyright (c) 2006-2025 Wade Alcorn - wade@bindshell.net
+# Browser Exploitation Framework (BeEF) - https://beefproject.com
 # See the file 'doc/COPYING' for copying permission
 #
 
@@ -20,13 +20,12 @@ module BeEF
       # @param [String] configuration_file Configuration file to be loaded,
       #        by default loads $root_dir/config.yaml
       def initialize(config)
-        raise TypeError, "'config' needs to be a string" unless config.string?
+        raise TypeError, "'config' needs to be a string" unless config.is_a?(String)
         raise TypeError, "Configuration file '#{config}' cannot be found" unless File.exist? config
 
         begin
           # open base config
           @config = load(config)
-          # set default value if key? does not exist
           @config.default = nil
           @@config = config
         rescue StandardError => e
@@ -72,10 +71,12 @@ module BeEF
 
         return unless validate_public_config_variable?(@config)
 
+        # Note for developers:
+        # The configuration path 'beef.http.public_port' is deprecated.
+        # Use the new format for public_port variables as described in the BeEF project documentation.
+        # Refer to the BeEF configuration guide for the web server configuration details:
+        # https://github.com/beefproject/beef/wiki/Configuration#web-server-configuration
         if @config['beef']['http']['public_port']
-          print_error 'Config path beef.http.public_port is deprecated.'
-          print_error 'Please use the new format for public variables found'
-          print_error 'https://github.com/beefproject/beef/wiki/Configuration#web-server-configuration'
           return
         end
 
@@ -154,7 +155,7 @@ module BeEF
         "#{beef_proto}://#{beef_host}:#{beef_port}"
       end
 
-      # Returns the hool path value stored in the config file
+      # Returns the hook path value stored in the config file
       #
       # @return [String] hook file path
       def hook_file_path
@@ -255,7 +256,7 @@ module BeEF
       #
       def load_modules_config
         set('beef.module', {})
-        # support nested sub-categories, like browser/hooked_domain/ajax_fingerprint
+        # support nested sub-categories, like browser/hooked_origin/ajax_fingerprint
         module_configs = File.join("#{$root_dir}/modules/**", 'config.yaml')
         Dir.glob(module_configs) do |cf|
           y = load(cf)
@@ -277,13 +278,15 @@ module BeEF
 
       private
 
+      # Note for developers:
+      # The configuration path 'beef.http.public' is deprecated.
+      # Use the new format for public variables as described in the BeEF project documentation.
+      # Refer to the BeEF configuration guide for the web server configuration details:
+      # https://github.com/beefproject/beef/wiki/Configuration#web-server-configuration
       def validate_public_config_variable?(config)
         return true if config['beef']['http']['public'].is_a?(Hash) ||
                        config['beef']['http']['public'].is_a?(NilClass)
 
-        print_error 'Config path beef.http.public is deprecated.'
-        print_error 'Please use the new format for public variables found'
-        print_error 'https://github.com/beefproject/beef/wiki/Configuration#web-server-configuration'
         false
       end
     end

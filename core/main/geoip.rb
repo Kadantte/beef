@@ -1,6 +1,6 @@
 #
-# Copyright (c) 2006-2022 Wade Alcorn - wade@bindshell.net
-# Browser Exploitation Framework (BeEF) - http://beefproject.com
+# Copyright (c) 2006-2025 Wade Alcorn - wade@bindshell.net
+# Browser Exploitation Framework (BeEF) - https://beefproject.com
 # See the file 'doc/COPYING' for copying permission
 #
 
@@ -18,7 +18,7 @@ module BeEF
         geoip_file = @config.get('beef.geoip.database')
 
         unless File.exist? geoip_file
-          print_error "[GeoIP] Could not find MaxMind GeoIP database: '#{geoip_file}'"
+          BeEF::Core::Logger.instance.register('System', "[GeoIP] Could not find MaxMind GeoIP database: '#{geoip_file}'")
           @enabled = false
           return
         end
@@ -48,7 +48,7 @@ module BeEF
       # @return [Hash] IP address lookup results
       #
       def lookup(ip)
-        raise TypeError, '"ip" needs to be a string' unless ip.string?
+        raise TypeError, '"ip" needs to be a string' unless ip.is_a?(String)
 
         return unless @enabled
 

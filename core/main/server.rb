@@ -1,6 +1,6 @@
 #
-# Copyright (c) 2006-2022 Wade Alcorn - wade@bindshell.net
-# Browser Exploitation Framework (BeEF) - http://beefproject.com
+# Copyright (c) 2006-2025 Wade Alcorn - wade@bindshell.net
+# Browser Exploitation Framework (BeEF) - https://beefproject.com
 # See the file 'doc/COPYING' for copying permission
 #
 
@@ -48,7 +48,7 @@ module BeEF
       #
       def mount(url, http_handler_class, args = nil)
         # argument type checking
-        raise TypeError, '"url" needs to be a string' unless url.string?
+        raise TypeError, '"url" needs to be a string' unless url.is_a?(String)
 
         @mounts[url] = if args.nil?
                          http_handler_class
@@ -64,7 +64,7 @@ module BeEF
       # @param [String] url URL to unmount.
       #
       def unmount(url)
-        raise TypeError, '"url" needs to be a string' unless url.string?
+        raise TypeError, '"url" needs to be a string' unless url.is_a?(String)
 
         @mounts.delete url
       end

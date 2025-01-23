@@ -1,9 +1,8 @@
 #
-# Copyright (c) 2006-2022 Wade Alcorn - wade@bindshell.net
-# Browser Exploitation Framework (BeEF) - http://beefproject.com
+# Copyright (c) 2006-2025 Wade Alcorn - wade@bindshell.net
+# Browser Exploitation Framework (BeEF) - https://beefproject.com
 # See the file 'doc/COPYING' for copying permission
 #
-
 require 'rest-client'
 require 'json'
 require_relative '../../spec_helper'
@@ -42,15 +41,17 @@ RSpec.describe 'Browser hooking with Websockets', run_on_browserstack: true do
     end
     # Load up DB and migrate if necessary
     ActiveRecord::Base.logger = nil
-    OTR::ActiveRecord.migrations_paths = [File.join('core', 'main', 'ar-migrations')]
     OTR::ActiveRecord.configure_from_hash!(adapter: 'sqlite3', database: db_file)
     # otr-activerecord require you to manually establish the connection with the following line
     #Also a check to confirm that the correct Gem version is installed to require it, likely easier for old systems.
     if Gem.loaded_specs['otr-activerecord'].version > Gem::Version.create('1.4.2')
       OTR::ActiveRecord.establish_connection!
     end
-    context = ActiveRecord::Migration.new.migration_context
-    ActiveRecord::Migrator.new(:up, context.migrations, context.schema_migration).migrate if context.needs_migration?
+
+    ActiveRecord::Migrator.migrations_paths = [File.join('core', 'main', 'ar-migrations')]
+    context = ActiveRecord::MigrationContext.new(ActiveRecord::Migrator.migrations_paths)
+    ActiveRecord::Migrator.new(:up, context.migrations, context.schema_migration, context.internal_metadata).migrate if context.needs_migration?
+    
     BeEF::Core::Migration.instance.update_db!
     # Spawn HTTP Server
     print_info 'Starting HTTP Hook Server'
@@ -74,7 +75,7 @@ RSpec.describe 'Browser hooking with Websockets', run_on_browserstack: true do
 
       @driver = Selenium::WebDriver.for(:remote,
                                         url: "http://#{CONFIG['user']}:#{CONFIG['key']}@#{CONFIG['server']}/wd/hub",
-                                        desired_capabilities: @caps)
+                                        options: @caps)
       # Hook new victim
       print_info 'Hooking a new victim, waiting a few seconds...'
       wait = Selenium::WebDriver::Wait.new(timeout: 30) # seconds
@@ -86,16 +87,6 @@ RSpec.describe 'Browser hooking with Websockets', run_on_browserstack: true do
       sleep 1 until wait.until { @driver.execute_script('return window.beef.session.get_hook_session_id().length') > 0 }
 
       @session = @driver.execute_script('return window.beef.session.get_hook_session_id().length')
-    rescue StandardError => e
-      print_info "Exception: #{e}"
-      print_info "Exception Class: #{e.class}"
-      print_info "Exception Message: #{e.message}"
-      print_info "Exception Stack Trace: #{e.backtrace}"
-      if @driver.execute_script('return window.beef.session.get_hook_session_id().length').nil?
-        exit 1
-      else
-        exit 0
-      end
     end
   end
 
@@ -115,15 +106,5 @@ RSpec.describe 'Browser hooking with Websockets', run_on_browserstack: true do
 
   it 'can successfully hook a browser' do
     expect(@session).not_to be_nil
-  rescue StandardError => e
-    print_info "Exception: #{e}"
-    print_info "Exception Class: #{e.class}"
-    print_info "Exception Message: #{e.message}"
-    print_info "Exception Stack Trace: #{e.stacktrace}"
-    if @driver.execute_script('return window.beef.session.get_hook_session_id().length').nil?
-      exit 1
-    else
-      expect(BeEF::Filters.is_valid_hook_session_id?(@driver.execute_script('return window.beef.session.get_hook_session_id()'))).to eq true
-    end
   end
 end
